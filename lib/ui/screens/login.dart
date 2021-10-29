@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // Try looking for stored values in local storage
     setState(() {
-      _hostUrl = preferences.hostUrl;
+      _hostUrl = preferences.hostUrl = 'https://music.girigovardhan.com';
       _email = preferences.userEmail;
     });
   }
@@ -152,7 +152,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: <Widget>[
                   ...[
                     Image.asset('assets/images/logo.png', width: 160),
-                    hostField,
+                    // hostField,
                     emailField,
                     passwordField,
                     SizedBox(
