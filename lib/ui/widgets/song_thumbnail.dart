@@ -10,24 +10,36 @@ class SongThumbnail extends StatelessWidget {
   final Song song;
   final ThumbnailSize size;
   final bool playing;
+  final bool buffering;
 
   const SongThumbnail({
     Key? key,
     required this.song,
     this.size = ThumbnailSize.sm,
     this.playing = false,
+    this.buffering = false
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return this.playing
-        ? PlayingSongThumbnail(
-            width: width,
-            height: height,
-            song: song,
-            borderRadius: borderRadius,
-          )
-        : ClipRRect(
+
+    if(this.playing) {
+      return PlayingSongThumbnail(
+        width: width,
+        height: height,
+        song: song,
+        borderRadius: borderRadius,
+      );
+    } else {
+      if(this.buffering) {
+        return BufferingSongThumbnail(
+          width: width,
+          height: height,
+          song: song,
+          borderRadius: borderRadius,
+        );
+      } else {
+        return ClipRRect(
             borderRadius: BorderRadius.circular(borderRadius),
             child: CachedNetworkImage(
               fit: BoxFit.cover,
@@ -38,6 +50,9 @@ class SongThumbnail extends StatelessWidget {
               imageUrl: song.imageUrl ?? preferences.defaultImageUrl,
             ),
           );
+      }
+    }
+    
   }
 
   double get width {
@@ -107,6 +122,52 @@ class PlayingSongThumbnail extends StatelessWidget {
               child: Image.asset('assets/images/loading-animation.gif'),
               width: 16,
               height: 16,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class BufferingSongThumbnail extends StatelessWidget {
+  final double width;
+  final double height;
+  final Song song;
+  final double borderRadius;
+
+  const BufferingSongThumbnail({
+    Key? key,
+    required this.width,
+    required this.height,
+    required this.song,
+    required this.borderRadius,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: width,
+      height: height,
+      child: Stack(
+        children: <Widget>[
+          SongThumbnail(song: song),
+          SizedBox(
+            width: double.infinity,
+            height: double.infinity,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
+                color: Colors.black54,
+              ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.center,
+            child: SizedBox(
+              child: Image.asset('assets/images/buffering-song.gif'),
+              width: 36,
+              height: 36,
             ),
           ),
         ],

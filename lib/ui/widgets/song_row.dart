@@ -18,6 +18,7 @@ class SongRow extends StatefulWidget {
   final bool bordered;
   final EdgeInsetsGeometry? padding;
   final SongListContext listContext;
+  static String bufferingSongId = '';
 
   /// The index of the row in a list, important for (Sliver) orderable lists.
   final int index;
@@ -62,7 +63,10 @@ class _SongRowState extends State<SongRow> {
     }
 
     return InkWell(
-      onTap: () async => await audio.play(song: widget.song),
+      onTap: () async {
+        SongRow.bufferingSongId = widget.song.id;
+        audio.play(song: widget.song);
+      },
       onLongPress: () {
         HapticFeedback.mediumImpact();
         widget.router.showActionSheet(context, song: widget.song);
@@ -127,12 +131,22 @@ class _SongRowThumbnailState extends State<SongRowThumbnail>
   late AudioProvider audio;
   PlayerState _state = PlayerState.stop;
   bool _isCurrentSong = false;
-
+  bool _isBuffering = false;
+ 
   @override
   void initState() {
     super.initState();
-
     audio = context.read();
+
+    subscribe(audio.player.isBuffering.listen((state) {
+      if(state) {
+        if(SongRow.bufferingSongId == widget.song.id) {
+          _isBuffering = state;
+        } 
+      } else {
+        _isBuffering = state;
+      }
+    }));
 
     subscribe(audio.player.playerState.listen((PlayerState state) {
       setState(() => _state = state);
@@ -154,6 +168,7 @@ class _SongRowThumbnailState extends State<SongRowThumbnail>
     return SongThumbnail(
       song: widget.song,
       playing: _state == PlayerState.play && _isCurrentSong,
+      buffering: _isBuffering
     );
   }
 }
