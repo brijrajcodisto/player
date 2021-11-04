@@ -1,4 +1,4 @@
-package phanan.koel.app
+package brijraj.flute.app
 
 import androidx.annotation.NonNull
 import io.flutter.embedding.android.FlutterActivity
